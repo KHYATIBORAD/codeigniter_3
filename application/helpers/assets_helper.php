@@ -87,7 +87,7 @@ if (!function_exists('load_js')) {
  *      echo load_img('28188.jpg',false)
  *      echo load_img('28188.jpg','alt da imagem','class="a"') ?>
  */
-if ( !function_exists('load_img') ) {
+<!-- if ( !function_exists('load_img') ) {
 
     function load_img( $img , $alt = TRUE , $attributes = '' )
     {
@@ -114,4 +114,4 @@ if ( !function_exists('load_img') ) {
         return ($alt) ? $exist_alt : $not_exist_alt;
     }
 
-}
+} -->

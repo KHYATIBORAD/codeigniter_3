@@ -13,7 +13,9 @@ class Welcome extends MY_Controller {
 	public function index()
 	{
 		//$this->load->view('welcome_message');
+		$this->load->view('partials/header');
 		$this->load->view('login');
+		$this->load->view('partials/footer');
 	}
 	public function helper()
 	{	
@@ -28,35 +30,35 @@ class Welcome extends MY_Controller {
 	// USER SEE REGISTER FORM
 	public function register($id='')
 	{
+		$this->load->view('partials/header');
 		if(!empty($id)) {
 				$data['userdata'] = $this->register_model->get_register_data($id);
 				$this->load->view('register',$data);
 			} else {
 				$this->load->view('register');
-			}	
+			}
+		$this->load->view('partials/footer');	
 	}
-
 
 	// THIS IS OUR HOME PAGE
 	public function home()
 	{	
-		if($this->session->userdata('isLoggedIn')){
+		//if($this->session->userdata('isLoggedIn')){
 			$this->load->view('partials/header');
 			$this->load->view('partials/navbar');
 			$this->load->view('partials/sidebar');
 			$this->load->view('dashbord');
 			$this->load->view('partials/footer');
-		}
-		else{
-			redirect('welcome');	
-		}
-		
+		// }
+		// else{
+		// 	redirect('welcome');	
+		// }
 	}
 
 	// USER FEEDBACK INSERT OR UPDATE
 	public function feedback($id='')
 	{
-		if($this->session->userdata('isLoggedIn')){
+		//if($this->session->userdata('isLoggedIn')){
 			$this->load->view('partials/header');
 			$this->load->view('partials/navbar');
 			$this->load->view('partials/sidebar');
@@ -67,47 +69,42 @@ class Welcome extends MY_Controller {
 				$this->load->view('feedback');
 			}
 			$this->load->view('partials/footer');
-		}
-		else{
-			redirect('welcome');	
-		}
-		
+		//}
+		// else{
+		// 	redirect('welcome');	
+		// }
 	}
 
 	// REGISTER USER DATA SHOW
 	public function viewuser()
 	{	
-		if($this->session->userdata('isLoggedIn')){
+		//if($this->session->userdata('isLoggedIn')){
 			$this->load->view('partials/header');
 			$this->load->view('partials/navbar');
 			$this->load->view('partials/sidebar');
 			$data['users'] = $this->register_model->viewuser();
 			$this->load->view('viewuser',$data);
-			$this->load->view('partials/footer');
-			
-		}
-		else{
-			redirect('welcome');	
-		}
-		
+			$this->load->view('partials/footer');	
+		// }
+		// else{
+		// 	redirect('welcome');	
+		// }
 	}
 
 	// USER FEEDBACK DATA SHOW
 	public function viewfeedback()
 	{	
-		if($this->session->userdata('isLoggedIn')){
+		//if($this->session->userdata('isLoggedIn')){
 			$this->load->view('partials/header');
 			$this->load->view('partials/navbar');
 			$this->load->view('partials/sidebar');
 			$data['feedback'] = $this->register_model->viewfeedback();
 			$this->load->view('viewfeedback',$data);
-			$this->load->view('partials/footer');
-			
-		}
-		else{
-			redirect('welcome');	
-		}
-		
+			$this->load->view('partials/footer');	
+		// }
+		// else{
+		// 	redirect('welcome');	
+		// }
 	}
 
 	// USER LOGOUT OUR ID
@@ -123,7 +120,12 @@ class Welcome extends MY_Controller {
 	public function insert_data()
 	{
 		$posted_data= $this->input->post();
-		if (isset($posted_data['btn-submit'])) {
+		$hashed_password = hash('sha1', $posted_data['password']);
+		$pass = [
+			'password' => $hashed_password
+		];
+		unset($posted_data['cnfpassword']);
+		if (!empty($posted_data)) {
 			$this->form_validation->set_error_delimiters('<div class="text-danger">','</div>');
 			$this->form_validation->set_rules('firstname','firstname','required');
 			$this->form_validation->set_rules('lastname','lastname','required');
@@ -137,7 +139,7 @@ class Welcome extends MY_Controller {
 			if ($this->form_validation->run() == FALSE) {
 				$this->register();
 			}else{
-				$resposne = $this->register_model->insert($posted_data);
+				$resposne = $this->register_model->insert(array_merge($posted_data, $pass));
 				if($resposne) {
 					redirect('welcome');
 				} 
@@ -152,7 +154,7 @@ class Welcome extends MY_Controller {
 	{	
 		$posted_data = $this->input->post();
 		$email= $posted_data['email'];
-		$password= $posted_data['password'];
+		$password = hash('sha1', $posted_data['password']);
 		if (isset($posted_data['btn-login'])) {
 			$this->form_validation->set_error_delimiters('<div class="text-danger">','</div>');
 			$this->form_validation->set_rules('email','email Id','required|valid_email');
@@ -170,16 +172,12 @@ class Welcome extends MY_Controller {
 			}
 		}else{
 			redirect(site_url('welcome/index'),'refresh');
-		}
-		
-		
+		}		
 	}
-
 
 	// IF USER GIVE FEEDBACK
 	public function feedback_data()
 	{
-		
 		$posted_data= $this->input->post();
 		$resposne = $this->register_model->feedback($posted_data);
 		if($resposne) {
